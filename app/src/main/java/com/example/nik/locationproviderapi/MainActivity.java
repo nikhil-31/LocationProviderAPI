@@ -57,7 +57,22 @@ public class MainActivity extends AppCompatActivity {
             requestPerms();
             mRequestingLocationUpdates = false;
         } else {
-            createLocationRequest();
+            // Retrieves the last know location
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                // Logic to handle location object
+                                textView.setText("lat " + location.getLatitude() + "lng " + location.getLongitude());
+                            } else {
+                                Toast.makeText(MainActivity.this, "The last know location was null," +
+                                        "Requesting for location updates", Toast.LENGTH_SHORT).show();
+                                createLocationRequest();
+                            }
+                        }
+                    });
         }
 
         // Callback to receive the location
@@ -73,24 +88,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        /*
-         Gets the last location
-         */
-        mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            // Logic to handle location object
-                            Toast.makeText(MainActivity.this, "lat " +
-                                            location.getLatitude() + "lng " + location.getLongitude(),
-                                    Toast.LENGTH_SHORT).show();
 
-                            textView.setText("lat " + location.getLatitude() + "lng " + location.getLongitude());
-                        }
-                    }
-                });
     }
 
     private void requestPerms() {
